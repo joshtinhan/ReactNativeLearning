@@ -12,12 +12,13 @@ import {
   setDoc,
   snapshotEqual,
   doc,
+  addDoc,
 } from "firebase/firestore";
 
 import { getDatabase, ref, set, get, onValue, query } from "firebase/database";
 
 import database from "../../firebase";
-const getDB = getDatabase();
+
 console.log(database);
 const auth = getAuth();
 
@@ -36,6 +37,7 @@ export const fetchUser = (payload) => {
 
 export const createUser = (payload) => {
   return async (dispatch) => {
+    const getDB = getDatabase();
     const { email, password, name } = payload;
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const updateResult = await updateProfile(auth.currentUser, {
@@ -45,7 +47,13 @@ export const createUser = (payload) => {
       user: { email: resultEmail, displayName, uid },
     } = result;
 
-    const docRef = await set(ref(getDB, "users"), {
+    // await set(ref(getDB, "users"), {
+    //   name: displayName,
+    //   email: resultEmail,
+    //   uid,
+    // });
+
+    await addDoc(collection(database, "users"), {
       name: displayName,
       email: resultEmail,
       uid,
